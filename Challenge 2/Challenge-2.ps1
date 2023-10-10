@@ -1,9 +1,7 @@
 # Step 1: Load relevant .NET library
 Add-Type -AssemblyName System.Security
 
-
 # Step 2: Encode and Decode Functions
-
 # Function to Encode (Encrypt) a string
 function New-EncodedString {
     param (
@@ -34,7 +32,6 @@ function Get-DecodedString {
 
 
 # Step 3: Test Encode and Decode Functions.
-
 # Encode the string
 $plainText = "I Love Using PowerShell!"
 $secureText = New-EncodedString -plainText $plainText
@@ -46,7 +43,6 @@ Write-Host "Decoded String: $retrievedPlainText"
 
 
 # Step 4: Add a Key and Update the Encode and Decode Functions
-
 function New-EncodedString {
     param (
         [string]$plainText,
