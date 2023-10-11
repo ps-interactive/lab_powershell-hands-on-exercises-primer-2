@@ -1,33 +1,53 @@
-# Key Step 1: Initialize variables to store directory paths and backup destinations.
-$directoriesToBackup = @("C:\Path\To\Directory1", "C:\Path\To\Directory2")  # Replace with your specific directories
-$backupDestination = "C:\BackupDestination"  # Replace with your backup destination
+# Step 1: Initialize variables to store directory paths and backup destinations.
+$directoriesToBackup = @("C:\Users\public\Desktop\PRIVATE_FILES", "C:\Users\public\Desktop\PUBLIC_FILES") 
+$backupDestination = "C:\Users\public\Desktop\BACKUP"
 
-# Ensure backup destination exists
+# Step 2: Ensure backup destination exists
 if (-not (Test-Path $backupDestination)) {
+    Write-Host "$($backupDestination) Does Not Exists...Creating" -ForegroundColor Red 
+
     New-Item -Path $backupDestination -ItemType Directory
 }
+else
+{
+    Write-Host "$($backupDestination) Already Exists" -ForegroundColor Green    
+}
 
-# Key Step 4: Maintain a log
+
+# Step 3: Create a backup log
 $logFile = "$backupDestination\backupLog.txt"
+New-Item -Path $logFile -ItemType File -Force
 
-# Key Step 2: Develop logic to iterate through the directories and initiate a backup
+
+# Step 4: Iterate through the directories and initiate a backup
+foreach ($dir in $directoriesToBackup) {
+    $backupName = (Get-Date -Format "yyyyMMddHHmmss") + "_" + ($dir -replace '[:\\]', '_') + ".zip"
+    $backupPath = Join-Path -Path $backupDestination -ChildPath $backupName
+    Compress-Archive -Path $dir -DestinationPath $backupPath
+    Add-Content -Path $logFile -Value "[$(Get-Date)] SUCCESS: Backed up $dir to $backupPath."
+}
+
+# Step 5: Cause Error for Non-Existent Directory
+$directoriesToBackup = @("C:\Users\public\Desktop\DOES_NOT_EXIST", "C:\Users\public\Desktop\PUBLIC_FILES") 
+foreach ($dir in $directoriesToBackup) {
+    $backupName = (Get-Date -Format "yyyyMMddHHmmss") + "_" + ($dir -replace '[:\\]', '_') + ".zip"
+    $backupPath = Join-Path -Path $backupDestination -ChildPath $backupName
+    Compress-Archive -Path $dir -DestinationPath $backupPath
+    Add-Content -Path $logFile -Value "[$(Get-Date)] SUCCESS: Backed up $dir to $backupPath."
+}
+
+# Step 6: Add Error Handling
 foreach ($dir in $directoriesToBackup) {
     try {
-        # Generate a unique backup name based on current date and time
         $backupName = (Get-Date -Format "yyyyMMddHHmmss") + "_" + ($dir -replace '[:\\]', '_') + ".zip"
         $backupPath = Join-Path -Path $backupDestination -ChildPath $backupName
-
-        # Key Step 3: Insert error handling
         if (Test-Path $dir) {
-            # Use Compress-Archive for backup
             Compress-Archive -Path $dir -DestinationPath $backupPath -ErrorAction Stop
-            # Log success
             Add-Content -Path $logFile -Value "[$(Get-Date)] SUCCESS: Backed up $dir to $backupPath."
         } else {
             throw "Directory $dir does not exist."
         }
     } catch {
-        # Log any errors
         Add-Content -Path $logFile -Value "[$(Get-Date)] ERROR: Failed to backup $dir. Reason: $($_.Exception.Message)"
     }
 }
