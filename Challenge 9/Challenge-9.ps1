@@ -1,126 +1,75 @@
-# Read a list of computer names or IP addresses from an external file
-$filePath = Read-Host "Enter the path to the file containing computer names or IP addresses"
-$computerList = Get-Content -Path $filePath
+# Prerequisite
+$path = "C:\Users\Public\Desktop\LAB_FILES\Challenge 8\"
 
-# Using the traditional ping command within PowerShell:
-function Test-Ping {
+# Step 1: Load the Computers.txt File from the $path
+$computers = Get-Content -Path "$path\Computers.txt"
+
+# Step 2: Load the Computers.txt File from the $path, and split the IP Address and Name into two variables
+$computers = Get-Content -Path "$path\Computers.txt" | ForEach-Object -Process {
+    $ip, $name = $_.Split(",")
+    [PSCustomObject]@{
+        IPAddress = $ip
+        Name = $name
+    }
+}
+$computers
+
+# Step 3: Ping the computers using Invoke-Expression
+$computers | ForEach-Object -Process {
+    Invoke-Expression -Command "ping.exe $($_.IPAddress)"
+}
+
+# Step 4: Ping the computers and store the results in a variable
+$pingResults = $computers | ForEach-Object -Process {
+    Test-Connection -ComputerName $_.IPAddress -Count 1 -Quiet
+}
+$pingResults
+
+# Step 5: Create a Function using Invoke-Expression for Pinging the computers
+function Ping-Computer {
     param (
-        [string]$computerName
+        [Parameter(Mandatory)]
+        [string]$IPAddress
     )
-    # Using Invoke-Expression to run the traditional ping command
-    $pingOutput = Invoke-Expression -Command "ping -n 1 $computerName"
-
-    if ($pingOutput -like '*TTL*') {
-        return @{
-            ComputerName = $computerName
-            Online       = $true
-            ResponseTime = ($pingOutput -split 'time=')[1].Split('ms')[0] + 'ms'
-        }
-    } else {
-        return @{
-            ComputerName = $computerName
-            Online       = $false
-            ResponseTime = "N/A"
-        }
-    }
+    Invoke-Expression -Command "ping.exe $IPAddress"
 }
 
-# Using the PowerShell Test-Connection cmdlet:
-function Test-ConnectionPing {
+# Step 6: Create a Function using Test-Connection for Pinging the computers
+function Ping-Computer {
     param (
-        [string]$computerName
+        [Parameter(Mandatory)]
+        [string]$IPAddress
     )
-    try {
-        $result = Test-Connection -ComputerName $computerName -Count 1 -ErrorAction Stop
-        return @{
-            ComputerName = $computerName
-            Online       = $true
-            ResponseTime = $result.ResponseTime
-        }
-    } catch {
-        return @{
-            ComputerName = $computerName
-            Online       = $false
-            ResponseTime = "N/A"
-        }
-    }
+    Test-Connection -ComputerName $IPAddress -Count 1 -Quiet
 }
 
-
-# To demonstrate both within the script:
-$filePath = Read-Host "Enter the path to the file containing computer names or IP addresses"
-$computerList = Get-Content -Path $filePath
-
-$method = Read-Host "Which method would you like to use? (1. Traditional ping, 2. Test-Connection)"
-
-$results = $computerList | ForEach-Object {
-    if ($method -eq "1") {
-        Test-Ping -computerName $_
-    } elseif ($method -eq "2") {
-        Test-ConnectionPing -computerName $_
-    } else {
-        Write-Error "Invalid method selected."
-        exit
-    }
-}
-
-# Display the results
-$results | Format-Table -Property ComputerName, Online, ResponseTime -AutoSize
-
-
-# Function
-# Read a list of computer names or IP addresses from an external file
-$filePath = Read-Host "Enter the path to the file containing computer names or IP addresses"
-$computerList = Get-Content -Path $filePath
-
-# Function to test connectivity using the 'Test-Connection' cmdlet (PowerShell's version of ping)
-function Test-ComputerPing {
+# Step 7: Create a Function that Offers a Choice to Ping the computers using Invoke-Expression or Test-Connection
+function Ping-Computer {
     param (
-        [string]$computerName
+        [Parameter(Mandatory)]
+        [string]$IPAddress
     )
-    try {
-        $result = Test-Connection -ComputerName $computerName -Count 1 -ErrorAction Stop
-        return @{
-            ComputerName = $computerName
-            Online       = $true
-            ResponseTime = $result.ResponseTime
-        }
-    } catch {
-        return @{
-            ComputerName = $computerName
-            Online       = $false
-            ResponseTime = "N/A"
-        }
+    $choice = Read-Host -Prompt "Do you want to use Invoke-Expression or Test-Connection?"
+    if ($choice -eq "Invoke-Expression") {
+        Invoke-Expression -Command "ping.exe $IPAddress"
+    }
+    elseif ($choice -eq "Test-Connection") {
+        Test-Connection -ComputerName $IPAddress -Count 1 -Quiet
+    }
+    else {
+        Write-Warning -Message "Invalid Choice"
     }
 }
 
-# Embed the ping command within a PowerShell script to check online statuses
-$results = $computerList | ForEach-Object {
-    Test-ComputerPing -computerName $_
+# Step 8: Ping the Computer, retrieve the name, IP address and Status, then generate a HTML report
+$pingResults = $computers | ForEach-Object -Process {
+    $pingResult = Ping-Computer -IPAddress $_.IPAddress
+    [PSCustomObject]@{
+        IPAddress = $_.IPAddress
+        Name = $_.Name
+        Status = $pingResult
+    }
 }
+$pingResults | ConvertTo-Html -Property IPAddress, Name, Status | Out-File -FilePath "$path\ping.html"
 
-# Display the results in a structured format
-$results | Format-Table -Property ComputerName, Online, ResponseTime -AutoSize
-
-
-# Ping the Computer, retrieve the name, IP address and Status, then generate a HTML report
-$computerName = Read-Host "Enter the name of the computer to ping"
-$pingOutput = Invoke-Expression -Command "ping -n 1 $computerName"
-
-if ($pingOutput -like '*TTL*') {
-    $status = "Online"
-} else {
-    $status = "Offline"
-}
-
-$ipAddress = [System.Net.Dns]::GetHostAddresses($computerName) | Select-Object -ExpandProperty IPAddressToString
-
-$report = [PSCustomObject]@{
-    ComputerName = $computerName
-    IPAddress    = $ipAddress
-    Status       = $status
-}
-
-$report | ConvertTo-Html -Property ComputerName, IPAddress, Status | Out-File -FilePath "$env:USERPROFILE\Desktop\ComputerStatus.html"
-Invoke-Item -Path "$env:USERPROFILE\Desktop\ComputerStatus.html"
 

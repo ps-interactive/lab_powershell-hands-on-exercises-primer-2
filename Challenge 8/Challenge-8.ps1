@@ -1,5 +1,5 @@
 # Prerequisite
-$path = "/Users/liamcleary/Documents/GitHub/lab_powershell-hands-on-exercises-primer-2/Challenge 8/Files"
+$path = "C:\Users\Public\Desktop\LAB_FILES\Challenge 8\Files"
 
 
 # Step 1: Get all files in the path and sort by size
