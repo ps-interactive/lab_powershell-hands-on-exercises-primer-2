@@ -33,6 +33,7 @@ function Ping-Computer {
     )
     Invoke-Expression -Command "ping.exe $IPAddress"
 }
+Ping-Computer -IPAddress "172.31.24.39"
 
 # Step 6: Create a Function using Test-Connection for Pinging the computers
 function Ping-Computer {
@@ -49,17 +50,32 @@ function Ping-Computer {
         [Parameter(Mandatory)]
         [string]$IPAddress
     )
+
     $choice = Read-Host -Prompt "Do you want to use Invoke-Expression or Test-Connection?"
+
     if ($choice -eq "Invoke-Expression") {
-        Invoke-Expression -Command "ping.exe $IPAddress"
+        $output = Invoke-Expression -Command "ping.exe $IPAddress" 2>$null
+        if($output -match "TTL=") {
+            $status = "Status: Online"
+        } else {
+            $status = "Status: Offline"
+        }
     }
     elseif ($choice -eq "Test-Connection") {
-        Test-Connection -ComputerName $IPAddress -Count 1 -Quiet
+        $output = Test-Connection -ComputerName $IPAddress -Count 1 -Quiet
+        if ($output) {
+            $status = "Status: Online"
+        } else {
+            $status = "Status: Offline"
+        }
     }
     else {
         Write-Warning -Message "Invalid Choice"
     }
+
+    return $status
 }
+
 
 # Step 8: Ping the Computer, retrieve the name, IP address and Status, then generate a HTML report
 $pingResults = $computers | ForEach-Object -Process {
@@ -70,6 +86,7 @@ $pingResults = $computers | ForEach-Object -Process {
         Status = $pingResult
     }
 }
-$pingResults | ConvertTo-Html -Property IPAddress, Name, Status | Out-File -FilePath "$path\ping.html"
+$pingResults | ConvertTo-Html -Property IPAddress, Name, Status | Out-File -FilePath "$path\Ping.html"
+Start-Process "$path\Ping.html"
 
 
