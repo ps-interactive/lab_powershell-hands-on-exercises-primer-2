@@ -6,7 +6,7 @@ $computers = Get-Content -Path "$path\Computers.txt"
 
 # Step 2: Load the Computers.txt File from the $path, and split the IP Address and Name into two variables
 $computers = Get-Content -Path "$path\Computers.txt" | ForEach-Object -Process {
-    $ip, $name = $_.Split(",")
+    $ip, $name = $_.Split(" ")
     [PSCustomObject]@{
         IPAddress = $ip
         Name = $name
