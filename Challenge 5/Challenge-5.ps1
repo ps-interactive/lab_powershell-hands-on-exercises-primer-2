@@ -1,6 +1,6 @@
 # Step 1: Define Variables
-$acceptableThreshold = 5 
-$criticalThreshold = 20
+$acceptableThreshold = 70 
+$criticalThreshold = 90
 $logFile = "C:\Users\public\Desktop\LAB_FILES\CPULogFile.txt" 
 
 # Step 2: Create the LogFile
