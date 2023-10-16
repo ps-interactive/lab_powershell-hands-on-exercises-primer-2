@@ -1,5 +1,5 @@
 # Prerequisite
-$path = "C:\Users\pslearner\Desktop\LAB_FILES\Challenge 9\"
+$path = "C:\Users\public\Desktop\LAB_FILES\Challenge 9\"
 
 # Step 1: Load the Computers.txt File from the $path
 $computers = Get-Content -Path "$path\Computers.txt"
@@ -43,6 +43,7 @@ function Ping-Computer {
     )
     Test-Connection -ComputerName $IPAddress -Count 1 -Quiet
 }
+Ping-Computer -IPAddress "172.31.24.39"
 
 # Step 7: Create a Function that Offers a Choice to Ping the computers using Invoke-Expression or Test-Connection
 function Ping-Computer {
@@ -75,7 +76,7 @@ function Ping-Computer {
 
     return $status
 }
-
+Ping-Computer -IPAddress "172.31.24.39"
 
 # Step 8: Ping the Computer, retrieve the name, IP address and Status, then generate a HTML report
 $pingResults = $computers | ForEach-Object -Process {
