@@ -1,6 +1,6 @@
 # Step 1: Initialize variables to store directory paths and backup destinations.
-$directoriesToBackup = @("C:\Users\public\Desktop\PRIVATE_FILES", "C:\Users\public\Desktop\PUBLIC_FILES") 
-$backupDestination = "C:\Users\public\Desktop\BACKUP"
+$directoriesToBackup = @("C:\Users\pslearner\Desktop\PRIVATE_FILES", "C:\Users\pslearner\Desktop\PUBLIC_FILES") 
+$backupDestination = "C:\Users\pslearner\Desktop\BACKUP"
 
 # Step 2: Ensure backup destination exists
 if (-not (Test-Path $backupDestination)) {
@@ -28,7 +28,7 @@ foreach ($dir in $directoriesToBackup) {
 }
 
 # Step 5: Cause Error for Non-Existent Directory
-$directoriesToBackup = @("C:\Users\public\Desktop\DOES_NOT_EXIST", "C:\Users\public\Desktop\PUBLIC_FILES") 
+$directoriesToBackup = @("C:\Users\pslearner\Desktop\DOES_NOT_EXIST", "C:\Users\pslearner\Desktop\PUBLIC_FILES") 
 foreach ($dir in $directoriesToBackup) {
     $backupName = (Get-Date -Format "yyyyMMddHHmmss") + "_" + ($dir -replace '[:\\]', '_') + ".zip"
     $backupPath = Join-Path -Path $backupDestination -ChildPath $backupName

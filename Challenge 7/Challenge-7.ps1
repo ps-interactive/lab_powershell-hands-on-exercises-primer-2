@@ -1,5 +1,5 @@
 # Prerequisite
-$path = "C:\Users\Public\Desktop\LAB_FILES\Challenge 7\Files"
+$path = "C:\Users\pslearner\Desktop\LAB_FILES\Challenge 7\Files"
 
 # Step 1: List all contents of the directory specified in the variable: $path
 Get-ChildItem -Path $path

@@ -1,5 +1,5 @@
 # Prerequisite
-$path = "C:\Users\Public\Desktop\LAB_FILES\Challenge 8\"
+$path = "C:\Users\pslearner\Desktop\LAB_FILES\Challenge 9\"
 
 # Step 1: Load the Computers.txt File from the $path
 $computers = Get-Content -Path "$path\Computers.txt"

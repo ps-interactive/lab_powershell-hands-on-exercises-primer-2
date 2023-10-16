@@ -45,7 +45,7 @@ Register-ScheduledTask -TaskName "Challenge 6 - Task 2" -Trigger $trigger -Actio
 $trigger = New-ScheduledTaskTrigger -At 12:00pm -Once
 $action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "-File ""C:\Users\public\Desktop\LAB_FILES\Challenge 6\ScheduledTask.ps1"""
 $settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable -RunOnlyIfNetworkAvailable -DontStopOnIdleEnd -Compatibility Win8
-$principal = New-ScheduledTaskPrincipal -UserID "LiamCleary" -LogonType ServiceAccount -RunLevel Highest
+$principal = New-ScheduledTaskPrincipal -UserID "pslearner" -LogonType ServiceAccount -RunLevel Highest
 Register-ScheduledTask -TaskName "Challenge 6 - Task 3" -Trigger $trigger -Action $action -Settings $settings -Principal $principal
 
 # Step 9: Start the Scheduled Task
